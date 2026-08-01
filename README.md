@@ -37,9 +37,7 @@ Open http://localhost:3000.
 
 ### Default staff login
 
-- URL: `/admin`
-- Username: `admin`
-- Password: `ImpactJobs2026!`
+
 
 Change this via the admin table (`lib/admins.ts`) before deploying publicly.
 
