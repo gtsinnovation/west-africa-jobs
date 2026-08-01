@@ -1,169 +1,131 @@
-import { Job, JobInput, WebhookLog } from "@/lib/types";
+import { prisma } from "@/lib/prisma";
+import { Job, JobInput, JobSource, WebhookLog } from "@/lib/types";
+import type { Job as JobRow, WebhookLog as WebhookLogRow } from "@prisma/client";
 
-const DIRECT_SOURCE = {
-  id: "direct",
-  name: "West Africa Impact Jobs",
-  homepageUrl: "",
-};
-
-// In-memory mock database. Resets on server restart — fine for demo purposes.
-const jobs: Job[] = [
-  {
-    id: "1",
-    title: "Program Officer, Youth Digital Skills",
-    organization: "BuildUp Liberia Foundation",
-    city: "Monrovia",
-    country: "Liberia",
-    sector: "Tech-for-Good",
-    jobType: "Full-time",
-    applicationUrl: "https://example.org/careers/program-officer-liberia",
-    description:
-      "Lead the rollout of digital-literacy bootcamps for out-of-school youth across Montserrado County, coordinating with local tech hubs and donors.",
-    postedDate: "2026-07-24",
-    closingDate: "2026-08-30",
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
-  },
-  {
-    id: "2",
-    title: "Community Health Field Coordinator",
-    organization: "Lofa Health Access Network",
-    city: "Voinjama",
-    country: "Liberia",
-    sector: "Healthcare",
-    jobType: "Contract",
-    applicationUrl: "https://example.org/careers/health-field-coordinator",
-    description:
-      "Coordinate mobile health clinics and maternal-health outreach in Lofa County in partnership with district health teams.",
-    postedDate: "2026-07-20",
-    closingDate: "2026-09-05",
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
-  },
-  {
-    id: "3",
-    title: "Monitoring & Evaluation Consultant",
-    organization: "West Africa Development Alliance",
-    city: "Accra",
-    country: "Ghana",
-    sector: "Capacity Building",
-    jobType: "Consultancy",
-    applicationUrl: "https://example.org/careers/me-consultant-ghana",
-    description:
-      "Design the M&E framework for a 3-year governance strengthening program spanning six regions of Ghana.",
-    postedDate: "2026-07-27",
-    closingDate: "2026-08-22",
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
-  },
-  {
-    id: "4",
-    title: "Girls' Education Project Manager",
-    organization: "Bright Futures Ghana",
-    city: "Tamale",
-    country: "Ghana",
-    sector: "Youth & Education",
-    jobType: "Full-time",
-    applicationUrl: "https://example.org/careers/girls-education-pm",
-    description:
-      "Manage a scholarship and mentorship program for adolescent girls in the Northern Region, including donor reporting and school partnerships.",
-    postedDate: "2026-07-18",
-    closingDate: "2026-08-31",
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
-  },
-  {
-    id: "5",
-    title: "Remote Grants & Compliance Officer",
-    organization: "Niger Delta Impact Collective",
-    city: "Port Harcourt",
-    country: "Nigeria",
-    sector: "Governance & Policy",
-    jobType: "Remote",
-    applicationUrl: "https://example.org/careers/grants-compliance-officer",
-    description:
-      "Support sub-grantee due diligence, donor compliance reporting, and financial monitoring for community-led NGOs across the Niger Delta.",
-    postedDate: "2026-07-29",
-    closingDate: "2026-09-15",
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
-  },
-];
-
-const webhookLogs: WebhookLog[] = [
-  {
-    id: "wh-1",
-    source: "ReliefWeb API Connector",
-    status: "pending",
-    receivedAt: "2026-07-30T09:14:00Z",
-    detail: "Live endpoint wired; awaiting an approved ReliefWeb appname to go active.",
-  },
-  {
-    id: "wh-2",
-    source: "External Partner Sync",
-    status: "success",
-    receivedAt: "2026-07-29T18:02:00Z",
-    detail: "Refreshed curated sample listings for 6 partner boards without public APIs.",
-  },
-  {
-    id: "wh-3",
-    source: "Devex Listings Import",
-    status: "failed",
-    receivedAt: "2026-07-28T07:45:00Z",
-    detail: "No public API/RSS exposed — requires a dedicated scraper connector.",
-  },
-];
-
-let idCounter = jobs.length + 1;
-
-export function getActiveJobs(): Job[] {
-  return jobs.filter((j) => !j.archived).sort((a, b) => (a.postedDate < b.postedDate ? 1 : -1));
-}
-
-export function getAllJobs(): Job[] {
-  return [...jobs].sort((a, b) => (a.postedDate < b.postedDate ? 1 : -1));
-}
-
-export function getJobById(id: string): Job | undefined {
-  return jobs.find((j) => j.id === id);
-}
-
-export function createJob(input: JobInput): Job {
-  const job: Job = {
-    ...input,
-    id: String(idCounter++),
-    postedDate: new Date().toISOString().slice(0, 10),
-    archived: false,
-    source: DIRECT_SOURCE,
-    isExternal: false,
+function toJob(row: JobRow): Job {
+  const source: JobSource = {
+    id: row.sourceId,
+    name: row.sourceName,
+    homepageUrl: row.sourceHomepageUrl,
   };
-  jobs.unshift(job);
-  return job;
+  return {
+    id: row.id,
+    title: row.title,
+    organization: row.organization,
+    city: row.city ?? undefined,
+    country: row.country,
+    sector: row.sector,
+    jobType: row.jobType,
+    applicationUrl: row.applicationUrl,
+    description: row.description,
+    postedDate: row.postedDate,
+    closingDate: row.closingDate,
+    archived: row.archived,
+    source,
+    isExternal: row.isExternal,
+  };
 }
 
-export function updateJob(id: string, input: Partial<JobInput>): Job | undefined {
-  const job = jobs.find((j) => j.id === id);
-  if (!job) return undefined;
-  Object.assign(job, input);
-  return job;
+function toWebhookLog(row: WebhookLogRow): WebhookLog {
+  return {
+    id: row.id,
+    source: row.source,
+    status: row.status as WebhookLog["status"],
+    receivedAt: row.receivedAt.toISOString(),
+    detail: row.detail,
+  };
 }
 
-export function setArchived(id: string, archived: boolean): Job | undefined {
-  const job = jobs.find((j) => j.id === id);
-  if (!job) return undefined;
-  job.archived = archived;
-  return job;
+export async function getActiveJobs(): Promise<Job[]> {
+  const rows = await prisma.job.findMany({
+    where: { archived: false },
+    orderBy: { postedDate: "desc" },
+  });
+  return rows.map(toJob);
 }
 
-export function getWebhookLogs(): WebhookLog[] {
-  return webhookLogs;
+export async function getAllJobs(): Promise<Job[]> {
+  const rows = await prisma.job.findMany({ orderBy: { postedDate: "desc" } });
+  return rows.map(toJob);
 }
 
-export function pushWebhookLog(log: WebhookLog): void {
-  webhookLogs.unshift(log);
+export async function getJobById(id: string): Promise<Job | undefined> {
+  const row = await prisma.job.findUnique({ where: { id } });
+  return row ? toJob(row) : undefined;
+}
+
+export async function createJob(input: JobInput): Promise<Job> {
+  const row = await prisma.job.create({
+    data: {
+      title: input.title,
+      organization: input.organization,
+      city: input.city ?? null,
+      country: input.country,
+      sector: input.sector,
+      jobType: input.jobType,
+      applicationUrl: input.applicationUrl,
+      description: input.description,
+      postedDate: new Date().toISOString().slice(0, 10),
+      closingDate: input.closingDate,
+      archived: false,
+      sourceId: "direct",
+      sourceName: "West Africa Impact Jobs",
+      sourceHomepageUrl: "",
+      isExternal: false,
+    },
+  });
+  return toJob(row);
+}
+
+export async function updateJob(
+  id: string,
+  input: Partial<JobInput>
+): Promise<Job | undefined> {
+  try {
+    const row = await prisma.job.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.organization !== undefined && { organization: input.organization }),
+        ...(input.city !== undefined && { city: input.city }),
+        ...(input.country !== undefined && { country: input.country }),
+        ...(input.sector !== undefined && { sector: input.sector }),
+        ...(input.jobType !== undefined && { jobType: input.jobType }),
+        ...(input.applicationUrl !== undefined && { applicationUrl: input.applicationUrl }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.closingDate !== undefined && { closingDate: input.closingDate }),
+      },
+    });
+    return toJob(row);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function setArchived(id: string, archived: boolean): Promise<Job | undefined> {
+  try {
+    const row = await prisma.job.update({ where: { id }, data: { archived } });
+    return toJob(row);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function getWebhookLogs(): Promise<WebhookLog[]> {
+  const rows = await prisma.webhookLog.findMany({
+    orderBy: { receivedAt: "desc" },
+    take: 50,
+  });
+  return rows.map(toWebhookLog);
+}
+
+export async function pushWebhookLog(log: WebhookLog): Promise<void> {
+  await prisma.webhookLog.create({
+    data: {
+      source: log.source,
+      status: log.status,
+      receivedAt: new Date(log.receivedAt),
+      detail: log.detail,
+    },
+  });
 }

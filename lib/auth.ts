@@ -20,7 +20,7 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   if (!token) return false;
   const adminId = verifyAdminSessionToken(token);
   if (!adminId) return false;
-  return !!findAdminById(adminId);
+  return !!(await findAdminById(adminId));
 }
 
 export async function getSessionAdminId(): Promise<string | null> {
