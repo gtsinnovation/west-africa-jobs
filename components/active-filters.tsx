@@ -22,7 +22,7 @@ export function ActiveFilters() {
   const removeParam = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(key);
-    router.push(`/?${params.toString()}`, { scroll: false });
+    router.push(`/jobs?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -41,7 +41,7 @@ export function ActiveFilters() {
         </button>
       ))}
       <button
-        onClick={() => router.push("/", { scroll: false })}
+        onClick={() => router.push("/jobs", { scroll: false })}
         className="ml-1 text-sm font-medium text-slate-500 underline decoration-dotted underline-offset-2 hover:text-slate-700"
       >
         Clear all

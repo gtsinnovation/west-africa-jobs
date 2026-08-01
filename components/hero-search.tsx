@@ -30,7 +30,7 @@ export function HeroSearch() {
       } else {
         params.set(key, value);
       }
-      router.push(`/?${params.toString()}`, { scroll: false });
+      router.push(`/jobs?${params.toString()}`, { scroll: false });
     },
     [router, searchParams]
   );

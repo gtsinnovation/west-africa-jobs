@@ -30,6 +30,21 @@ export async function SiteHeader() {
           </span>
         </Link>
 
+        <nav className="hidden items-center gap-5 md:flex">
+          <Link
+            href="/jobs"
+            className="text-sm font-medium text-slate-600 hover:text-emerald-700"
+          >
+            Jobs
+          </Link>
+          <Link
+            href="/insights"
+            className="text-sm font-medium text-slate-600 hover:text-emerald-700"
+          >
+            Insights
+          </Link>
+        </nav>
+
         <div className="flex items-center gap-2 sm:gap-3">
           {userId ? (
             <Link

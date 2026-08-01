@@ -23,7 +23,7 @@ export default async function JobDetailPage({
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
         <Link
-          href="/"
+          href="/jobs"
           className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-emerald-700"
         >
           <ArrowLeft className="h-4 w-4" />
