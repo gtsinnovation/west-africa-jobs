@@ -47,12 +47,15 @@ export async function POST(request: Request) {
     text,
   });
 
+  const messages: Record<string, string> = {
+    ahasend: "Account created. Check your inbox for a verification link.",
+    smtp: "Account created. Check your inbox for a verification link.",
+    dev: "Account created. No email provider is configured yet, so the verification email was captured in the admin Dev Mailbox instead of a real inbox.",
+  };
+
   return NextResponse.json({
     success: true,
     emailMode: mode,
-    message:
-      mode === "smtp"
-        ? "Account created. Check your inbox for a verification link."
-        : "Account created. No SMTP is configured yet, so the verification email was captured in the admin Dev Mailbox instead of a real inbox.",
+    message: messages[mode],
   });
 }

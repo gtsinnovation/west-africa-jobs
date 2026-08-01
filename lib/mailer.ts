@@ -8,7 +8,7 @@ export interface OutboxEmail {
   html: string;
   text: string;
   sentAt: string;
-  mode: "smtp" | "dev";
+  mode: "ahasend" | "smtp" | "dev";
 }
 
 const outbox: OutboxEmail[] = [];
@@ -17,27 +17,71 @@ export function getOutbox(): OutboxEmail[] {
   return outbox;
 }
 
+function ahaSendConfigured(): boolean {
+  return !!(
+    process.env.AHASEND_API_KEY &&
+    process.env.AHASEND_ACCOUNT_ID &&
+    process.env.AHASEND_FROM_EMAIL
+  );
+}
+
 function smtpConfigured(): boolean {
   return !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
+async function sendViaAhaSend(params: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}): Promise<void> {
+  const accountId = process.env.AHASEND_ACCOUNT_ID;
+  const apiKey = process.env.AHASEND_API_KEY;
+  const fromEmail = process.env.AHASEND_FROM_EMAIL!;
+  const fromName = process.env.AHASEND_FROM_NAME ?? "West Africa Impact Jobs";
+
+  const res = await fetch(`https://api.ahasend.com/v2/accounts/${accountId}/messages`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: { email: fromEmail, name: fromName },
+      recipients: [{ email: params.to }],
+      subject: params.subject,
+      html_content: params.html,
+      text_content: params.text,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`AhaSend send failed (HTTP ${res.status}): ${body}`);
+  }
+}
+
 /**
- * Sends transactional email. If SMTP_* env vars are configured, sends real
- * mail via nodemailer. Otherwise, falls back to a "dev outbox" — the email
- * is stored in memory and viewable by an admin at /admin/dashboard so the
- * full signup → verify → login flow can be exercised end-to-end without a
- * real mail provider. Swap in real SMTP credentials (or a provider like
- * Postmark/SendGrid/Resend) via env vars to go live with zero code changes.
+ * Sends transactional email. Priority order:
+ *  1. AhaSend (AHASEND_API_KEY + AHASEND_ACCOUNT_ID + AHASEND_FROM_EMAIL) — real
+ *     provider send via their REST API v2 create-message endpoint.
+ *  2. Generic SMTP (SMTP_HOST/USER/PASS) via nodemailer.
+ *  3. Dev outbox fallback — captured in memory and viewable by an admin at
+ *     /admin/dashboard so the full signup → verify → login flow can be
+ *     exercised end-to-end without a real mail provider.
  */
 export async function sendEmail(params: {
   to: string;
   subject: string;
   html: string;
   text: string;
-}): Promise<{ mode: "smtp" | "dev" }> {
-  const useSmtp = smtpConfigured();
+}): Promise<{ mode: "ahasend" | "smtp" | "dev" }> {
+  let mode: "ahasend" | "smtp" | "dev" = "dev";
 
-  if (useSmtp) {
+  if (ahaSendConfigured()) {
+    await sendViaAhaSend(params);
+    mode = "ahasend";
+  } else if (smtpConfigured()) {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT ?? 587),
@@ -51,6 +95,7 @@ export async function sendEmail(params: {
       html: params.html,
       text: params.text,
     });
+    mode = "smtp";
   }
 
   outbox.unshift({
@@ -60,11 +105,11 @@ export async function sendEmail(params: {
     html: params.html,
     text: params.text,
     sentAt: new Date().toISOString(),
-    mode: useSmtp ? "smtp" : "dev",
+    mode,
   });
   if (outbox.length > 50) outbox.length = 50;
 
-  return { mode: useSmtp ? "smtp" : "dev" };
+  return { mode };
 }
 
 export function verificationEmailTemplate(verifyUrl: string) {

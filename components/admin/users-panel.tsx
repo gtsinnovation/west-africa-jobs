@@ -20,8 +20,23 @@ interface OutboxEmail {
   subject: string;
   text: string;
   sentAt: string;
-  mode: "smtp" | "dev";
+  mode: "ahasend" | "smtp" | "dev";
 }
+
+const modeBadge: Record<OutboxEmail["mode"], { label: string; className: string }> = {
+  ahasend: {
+    label: "sent via AhaSend",
+    className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  },
+  smtp: {
+    label: "sent via SMTP",
+    className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  },
+  dev: {
+    label: "dev capture",
+    className: "bg-slate-100 text-slate-600 hover:bg-slate-100",
+  },
+};
 
 export function UsersPanel() {
   const [users, setUsers] = useState<PublicUser[]>([]);
@@ -100,9 +115,9 @@ export function UsersPanel() {
             Dev Mailbox
           </CardTitle>
           <p className="text-sm text-slate-500">
-            No SMTP credentials are configured yet, so verification emails are captured here
-            instead of a real inbox. Add SMTP_HOST/SMTP_USER/SMTP_PASS env vars to send real
-            email.
+            When AhaSend or SMTP credentials are configured, verification emails are sent for
+            real and logged here for reference. Otherwise they're captured here only, viewable
+            by an admin instead of landing in a real inbox.
           </p>
         </CardHeader>
         <CardContent>
@@ -117,14 +132,8 @@ export function UsersPanel() {
                       <Mail className="h-3.5 w-3.5 text-emerald-600" />
                       {mail.subject}
                     </span>
-                    <Badge
-                      className={
-                        mail.mode === "smtp"
-                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-100"
-                      }
-                    >
-                      {mail.mode === "smtp" ? "sent via SMTP" : "dev capture"}
+                    <Badge className={modeBadge[mail.mode].className}>
+                      {modeBadge[mail.mode].label}
                     </Badge>
                   </div>
                   <p className="mt-1 text-xs text-slate-400">
