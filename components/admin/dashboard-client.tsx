@@ -10,12 +10,15 @@ import { JobIngestionForm } from "@/components/admin/job-ingestion-form";
 import { JobInventoryTable } from "@/components/admin/job-inventory-table";
 import { IntegrationGateway } from "@/components/admin/integration-gateway";
 import { UsersPanel } from "@/components/admin/users-panel";
+import { InsightEditorForm } from "@/components/admin/insight-editor-form";
+import { InsightsTable } from "@/components/admin/insights-table";
 
 export function DashboardClient() {
   const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [logs, setLogs] = useState<WebhookLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [insightsRefreshKey, setInsightsRefreshKey] = useState(0);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -70,6 +73,7 @@ export function DashboardClient() {
           <TabsList className="flex-wrap">
             <TabsTrigger value="ingest">Ingestion Desk</TabsTrigger>
             <TabsTrigger value="inventory">Active Inventory</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
             <TabsTrigger value="users">Users &amp; Mail</TabsTrigger>
           </TabsList>
@@ -80,6 +84,11 @@ export function DashboardClient() {
 
           <TabsContent value="inventory" className="mt-4">
             <JobInventoryTable jobs={jobs} loading={loading} onChanged={refresh} />
+          </TabsContent>
+
+          <TabsContent value="insights" className="mt-4 space-y-6">
+            <InsightEditorForm onCreated={() => setInsightsRefreshKey((k) => k + 1)} />
+            <InsightsTable refreshKey={insightsRefreshKey} />
           </TabsContent>
 
           <TabsContent value="integrations" className="mt-4">
