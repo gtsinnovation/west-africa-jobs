@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Briefcase, UserCircle } from "lucide-react";
+import Image from "next/image";
+import { UserCircle } from "lucide-react";
 import { getSessionUserId } from "@/lib/user-session";
 
 export async function SiteHeader() {
@@ -9,8 +10,15 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
-            <Briefcase className="h-5 w-5" />
+          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+            <Image
+              src="/logo-icon.png"
+              alt="West Africa Impact Jobs logo"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
+              priority
+            />
           </span>
           <span className="flex flex-col leading-tight">
             <span className="text-base font-bold tracking-tight text-slate-800 sm:text-lg">
