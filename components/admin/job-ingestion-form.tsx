@@ -25,6 +25,7 @@ interface JobIngestionFormProps {
 const emptyForm: JobInput = {
   title: "",
   organization: "",
+  city: "",
   country: "",
   sector: "",
   jobType: "",
@@ -97,6 +98,17 @@ export function JobIngestionForm({ onCreated }: JobIngestionFormProps) {
               value={form.organization}
               onChange={(e) => update("organization", e.target.value)}
               placeholder="e.g. BuildUp Liberia Foundation"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="city">City</Label>
+            <Input
+              id="city"
+              required
+              value={form.city}
+              onChange={(e) => update("city", e.target.value)}
+              placeholder="e.g. Monrovia"
             />
           </div>
 

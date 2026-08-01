@@ -43,7 +43,13 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as JobInput;
 
-  if (!body.title || !body.organization || !body.country || !body.applicationUrl) {
+  if (
+    !body.title ||
+    !body.organization ||
+    !body.city ||
+    !body.country ||
+    !body.applicationUrl
+  ) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
 
