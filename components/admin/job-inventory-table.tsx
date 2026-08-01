@@ -74,6 +74,7 @@ export function JobInventoryTable({ jobs, loading, onChanged }: JobInventoryTabl
         body: JSON.stringify({
           title: editingJob.title,
           organization: editingJob.organization,
+          city: editingJob.city,
           country: editingJob.country,
           sector: editingJob.sector,
           jobType: editingJob.jobType,
@@ -106,7 +107,7 @@ export function JobInventoryTable({ jobs, loading, onChanged }: JobInventoryTabl
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Country</TableHead>
+              <TableHead>City / Country</TableHead>
               <TableHead className="hidden sm:table-cell">Sector</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -133,7 +134,10 @@ export function JobInventoryTable({ jobs, loading, onChanged }: JobInventoryTabl
                   <div className="font-medium text-slate-800">{job.title}</div>
                   <div className="text-xs text-slate-400">{job.organization}</div>
                 </TableCell>
-                <TableCell className="whitespace-nowrap text-sm">{job.country}</TableCell>
+                <TableCell className="whitespace-nowrap text-sm">
+                  {job.city ? `${job.city}, ` : ""}
+                  {job.country}
+                </TableCell>
                 <TableCell className="hidden whitespace-nowrap text-sm sm:table-cell">
                   {job.sector}
                 </TableCell>
@@ -198,6 +202,13 @@ export function JobInventoryTable({ jobs, loading, onChanged }: JobInventoryTabl
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
+                  <Label>City</Label>
+                  <Input
+                    value={editingJob.city ?? ""}
+                    onChange={(e) => setEditingJob({ ...editingJob, city: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1.5">
                   <Label>Country</Label>
                   <Select
                     value={editingJob.country}
@@ -210,24 +221,6 @@ export function JobInventoryTable({ jobs, loading, onChanged }: JobInventoryTabl
                       {COUNTRIES.filter((c) => c.name !== "All West Africa").map((c) => (
                         <SelectItem key={c.name} value={c.name}>
                           {c.flag} {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Sector</Label>
-                  <Select
-                    value={editingJob.sector}
-                    onValueChange={(v) => setEditingJob({ ...editingJob, sector: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SECTORS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
                         </SelectItem>
                       ))}
                     </SelectContent>

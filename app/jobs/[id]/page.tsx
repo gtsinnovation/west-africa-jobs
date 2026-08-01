@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Clock, Briefcase, Layers, Calendar } from "lucide-react";
+import { ArrowLeft, ExternalLink, Clock, Briefcase, Layers, Calendar, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getJobById } from "@/lib/store";
@@ -39,6 +39,13 @@ export default async function JobDetailPage({
           </div>
 
           <h1 className="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">{job.title}</h1>
+
+          {job.city && (
+            <p className="mt-1 flex items-center gap-1 text-sm text-slate-400">
+              <MapPin className="h-4 w-4" />
+              {job.city}, {job.country}
+            </p>
+          )}
 
           <div className="mt-3 flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">

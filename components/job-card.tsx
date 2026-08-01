@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { ExternalLink, Clock, Briefcase, Layers, Check, Globe2 } from "lucide-react";
+import { ExternalLink, Clock, Briefcase, Layers, Check, Globe2, MapPin } from "lucide-react";
 import { Job } from "@/lib/types";
 import { flagFor } from "@/lib/constants";
 
@@ -82,6 +82,13 @@ export function JobCard({ job }: JobCardProps) {
         <Link href={`/jobs/${job.id}`} className="mt-1.5 block">
           {titleContent}
         </Link>
+      )}
+
+      {job.city && (
+        <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
+          <MapPin className="h-3.5 w-3.5" />
+          {job.city}, {job.country}
+        </p>
       )}
 
       <div className="mt-2.5 flex flex-wrap items-center gap-2">
