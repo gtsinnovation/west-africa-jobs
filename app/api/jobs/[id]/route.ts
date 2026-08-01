@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const job = getJobById(id);
+  const job = await getJobById(id);
   if (!job || job.archived) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -36,12 +36,12 @@ export async function PATCH(
   const body = await request.json();
 
   if (typeof body.archived === "boolean" && Object.keys(body).length === 1) {
-    const job = setArchived(id, body.archived);
+    const job = await setArchived(id, body.archived);
     if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(job);
   }
 
-  const job = updateJob(id, body);
+  const job = await updateJob(id, body);
   if (!job) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(job);
 }

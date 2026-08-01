@@ -6,5 +6,6 @@ export async function GET() {
   const authed = await isAdminAuthenticated();
   if (!authed) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  return NextResponse.json(getAllUsers().map(toPublicUser));
+  const users = await getAllUsers();
+  return NextResponse.json(users.map(toPublicUser));
 }

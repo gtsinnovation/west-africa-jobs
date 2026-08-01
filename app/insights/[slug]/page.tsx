@@ -10,7 +10,7 @@ export default async function InsightDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const insight = getInsightBySlug(slug);
+  const insight = await getInsightBySlug(slug);
 
   if (!insight) {
     notFound();

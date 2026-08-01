@@ -3,8 +3,8 @@ import { ArrowLeft, Newspaper } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { getPublishedInsights } from "@/lib/insights";
 
-export default function InsightsPage() {
-  const insights = getPublishedInsights();
+export default async function InsightsPage() {
+  const insights = await getPublishedInsights();
 
   return (
     <div className="min-h-screen bg-[#0b1d3a]">

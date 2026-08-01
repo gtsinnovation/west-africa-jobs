@@ -13,8 +13,9 @@ export async function POST(request: Request) {
   }
 
   const { email } = (await request.json()) as { email?: string };
-  const user = email ? findUserByEmail(email) : undefined;
+  const user = email ? await findUserByEmail(email) : undefined;
 
+  // Always respond generically to avoid leaking which emails are registered.
   const generic = NextResponse.json({
     success: true,
     message: "If an account exists for that email, a new verification link has been sent.",
@@ -22,12 +23,12 @@ export async function POST(request: Request) {
 
   if (!user || user.verified) return generic;
 
-  regenerateVerificationToken(user);
+  const updated = await regenerateVerificationToken(user);
   const origin = new URL(request.url).origin;
-  const verifyUrl = `${origin}/verify-email?token=${user.verificationToken}`;
+  const verifyUrl = `${origin}/verify-email?token=${updated.verificationToken}`;
   const { html, text } = verificationEmailTemplate(verifyUrl);
   await sendEmail({
-    to: user.email,
+    to: updated.email,
     subject: "Verify your email — West Africa Impact Jobs",
     html,
     text,

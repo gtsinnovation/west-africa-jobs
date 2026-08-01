@@ -7,5 +7,5 @@ export async function GET() {
   if (!authed) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.json(getWebhookLogs());
+  return NextResponse.json(await getWebhookLogs());
 }

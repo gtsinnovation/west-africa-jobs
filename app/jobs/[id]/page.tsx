@@ -12,7 +12,7 @@ export default async function JobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const job = getJobById(id);
+  const job = await getJobById(id);
 
   if (!job || job.archived) {
     notFound();

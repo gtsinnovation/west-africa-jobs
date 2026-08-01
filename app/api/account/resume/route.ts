@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = findUserById(userId);
+  const user = await findUserById(userId);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const formData = await request.formData();
@@ -57,12 +57,12 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(uploadsDir, filename), buffer);
 
-  setResume(user, {
+  const updated = await setResume(user, {
     filename: file.name,
     url: `/uploads/resumes/${filename}`,
     uploadedAt: new Date().toISOString(),
     sizeBytes: file.size,
   });
 
-  return NextResponse.json(toPublicUser(user));
+  return NextResponse.json(toPublicUser(updated));
 }

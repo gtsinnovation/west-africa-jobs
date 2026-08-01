@@ -6,7 +6,7 @@ export async function GET() {
   const userId = await getSessionUserId();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const user = findUserById(userId);
+  const user = await findUserById(userId);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   return NextResponse.json(toPublicUser(user));

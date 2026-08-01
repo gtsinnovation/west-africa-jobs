@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  if (findUserByEmail(email)) {
+  if (await findUserByEmail(email)) {
     return NextResponse.json(
       { error: "An account with this email already exists." },
       { status: 409 }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = createUser(email, passwordHash);
+  const user = await createUser(email, passwordHash);
 
   const origin = new URL(request.url).origin;
   const verifyUrl = `${origin}/verify-email?token=${user.verificationToken}`;

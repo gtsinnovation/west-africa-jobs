@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing verification token." }, { status: 400 });
   }
 
-  const user = findUserByVerificationToken(token);
+  const user = await findUserByVerificationToken(token);
   if (!user) {
     return NextResponse.json(
       { error: "This verification link is invalid or has already been used." },
@@ -22,6 +22,6 @@ export async function POST(request: Request) {
     );
   }
 
-  markVerified(user);
+  await markVerified(user);
   return NextResponse.json({ success: true, email: user.email });
 }

@@ -24,12 +24,12 @@ export async function PATCH(
   const body = await request.json();
 
   if (typeof body.published === "boolean" && Object.keys(body).length === 1) {
-    const insight = setPublished(id, body.published);
+    const insight = await setPublished(id, body.published);
     if (!insight) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(insight);
   }
 
-  const insight = updateInsight(id, body);
+  const insight = await updateInsight(id, body);
   if (!insight) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(insight);
 }
@@ -43,7 +43,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id } = await params;
-  const insight = getInsightById(id);
+  const insight = await getInsightById(id);
   if (!insight) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(insight);
 }

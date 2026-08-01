@@ -21,10 +21,10 @@ export async function GET(request: Request) {
     if (!authed) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(getAllJobs());
+    return NextResponse.json(await getAllJobs());
   }
 
-  return NextResponse.json(getActiveJobs());
+  return NextResponse.json(await getActiveJobs());
 }
 
 export async function POST(request: Request) {
@@ -53,6 +53,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
 
-  const job = createJob(body);
+  const job = await createJob(body);
   return NextResponse.json(job, { status: 201 });
 }

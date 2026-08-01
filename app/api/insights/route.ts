@@ -21,10 +21,10 @@ export async function GET(request: Request) {
     if (!authed) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json(getAllInsights());
+    return NextResponse.json(await getAllInsights());
   }
 
-  return NextResponse.json(getPublishedInsights());
+  return NextResponse.json(await getPublishedInsights());
 }
 
 export async function POST(request: Request) {
@@ -47,6 +47,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
   }
 
-  const insight = createInsight(body);
+  const insight = await createInsight(body);
   return NextResponse.json(insight, { status: 201 });
 }

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   const { email, password } = (await request.json()) as { email?: string; password?: string };
-  const user = email ? findUserByEmail(email) : undefined;
+  const user = email ? await findUserByEmail(email) : undefined;
 
   if (!user || !(await bcrypt.compare(password ?? "", user.passwordHash))) {
     return NextResponse.json({ error: "Incorrect email or password." }, { status: 401 });
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 7, // 7 days
   });
   return response;
 }

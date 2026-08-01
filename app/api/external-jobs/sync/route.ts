@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   const jobs = await getExternalJobs(true);
   const state = getSyncState();
 
-  pushWebhookLog({
+  await pushWebhookLog({
     id: `wh-${Date.now()}`,
     source: "ReliefWeb API Connector",
     status: state?.reliefWebLive ? "success" : "failed",
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       : `Sync rejected: ${state?.reliefWebError ?? "unknown error"}`,
   });
 
-  pushWebhookLog({
+  await pushWebhookLog({
     id: `wh-${Date.now() + 1}`,
     source: "Afrorama / WACSI / Impactpool Connectors",
     status: "success",
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     } Impactpool listings live.`,
   });
 
-  pushWebhookLog({
+  await pushWebhookLog({
     id: `wh-${Date.now() + 2}`,
     source: "Sample Partner Boards",
     status: "success",
