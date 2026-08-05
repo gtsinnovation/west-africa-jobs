@@ -1,9 +1,28 @@
 import crypto from "crypto";
 
-const SECRET = process.env.SESSION_SECRET ?? "waij-dev-session-secret-change-me";
+const SECRET = process.env.SESSION_SECRET;
+
+// Validate that SESSION_SECRET is set in non-development environments
+if (!SECRET && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "SESSION_SECRET environment variable is required in production. " +
+    "Set a long, random value (e.g., openssl rand -hex 32)"
+  );
+}
+
+// Fallback for development only - never use this in production
+const DEV_SECRET = "waij-dev-session-secret-change-me-in-production";
+const EFFECTIVE_SECRET = SECRET ?? DEV_SECRET;
+
+if (!SECRET && process.env.NODE_ENV !== "production") {
+  console.warn(
+    "⚠️  WARNING: Using default SESSION_SECRET. This is insecure for production. " +
+    "Set SESSION_SECRET environment variable to a long random string."
+  );
+}
 
 function sign(payload: string): string {
-  return crypto.createHmac("sha256", SECRET).update(payload).digest("hex");
+  return crypto.createHmac("sha256", EFFECTIVE_SECRET).update(payload).digest("hex");
 }
 
 export function createSignedToken(data: Record<string, unknown>): string {
