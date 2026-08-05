@@ -35,7 +35,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No file provided." }, { status: 400 });
   }
 
-  const ext = path.extname(file.name).toLowerCase();
+  // Sanitize filename to prevent directory traversal attacks
+  const originalName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const ext = path.extname(originalName).toLowerCase();
+  
   if (!ALLOWED_TYPES.has(file.type) && !ALLOWED_EXT.has(ext)) {
     return NextResponse.json(
       { error: "Only PDF, DOC, and DOCX files are accepted." },
