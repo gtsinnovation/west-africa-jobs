@@ -1,10 +1,7 @@
 import { Job } from "@/lib/types";
 import { getSourceMeta } from "@/lib/external-sources";
 
-// Afrorama's own front-end (afrorama.org/js/opportunities.js) queries this
-// exact Supabase REST endpoint client-side with this public "publishable"
-// anon key to render its job map/list. We call the same public, read-only
-// endpoint their browser client uses — no private credentials involved.
+// Afrorama's Supabase REST endpoint (public anon key)
 const SUPABASE_URL = "https://vqchwioyhyiuunpyildz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_HeGZfQZEDI_IR46a2Ezp-Q_tIUdhF6_";
 
@@ -59,14 +56,12 @@ interface AfroramaListing {
 export async function fetchAfroramaJobs(): Promise<Job[]> {
   const source = getSourceMeta("afrorama")!;
   const codes = Object.keys(COUNTRY_CODE_MAP).join(",");
-  const params = new URLSearchParams();
-  params.set(
-    "select",
-    "id,title,organisation,type,sector,country,posted,deadline,apply_url,description"
-  );
-  params.set("country", `in.(${codes})`);
-  params.set("order", "posted.desc.nullslast");
-  params.set("limit", "20");
+  const params = new URLSearchParams({
+    select: "id,title,organisation,type,sector,country,posted,deadline,apply_url,description",
+    country: `in.(${codes})`,
+    order: "posted.desc.nullslast",
+    limit: "20",
+  });
 
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/listings?${params.toString()}`, {

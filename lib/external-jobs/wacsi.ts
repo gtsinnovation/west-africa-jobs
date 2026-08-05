@@ -23,18 +23,14 @@ function stripHtml(html: string): string {
 
 function detectCountry(text: string): string | null {
   const lower = text.toLowerCase();
-  return (
-    WEST_AFRICA_COUNTRIES.find((c) => lower.includes(c.toLowerCase())) ?? null
-  );
+  return WEST_AFRICA_COUNTRIES.find((c) => lower.includes(c.toLowerCase())) ?? null;
 }
 
+const WACSI_API_BASE = "https://wacsi.org/wp-json/wp/v2/posts";
+
 /**
- * Live WACSI connector. WACSI runs on WordPress, which exposes a public,
- * read-only REST API at /wp-json/wp/v2/posts. We search their real posts
- * feed for opportunity-shaped announcements — the same content WACSI
- * publishes under Work With Us — filter out unrelated news matches, and
- * heuristically tag each with whichever West African country is mentioned
- * in the title/excerpt (defaulting to Ghana, WACSI's HQ, when none is).
+ * Fetches opportunity posts from WACSI's WordPress REST API.
+ * Searches for opportunity-shaped announcements and tags with West African country.
  */
 export async function fetchWacsiJobs(): Promise<Job[]> {
   const source = getSourceMeta("wacsi")!;
@@ -50,7 +46,7 @@ export async function fetchWacsiJobs(): Promise<Job[]> {
           order: "desc",
           _fields: "id,link,date,title,excerpt",
         });
-        const res = await fetch(`https://wacsi.org/wp-json/wp/v2/posts?${params.toString()}`, {
+        const res = await fetch(`${WACSI_API_BASE}?${params.toString()}`, {
           next: { revalidate: 900 },
         });
         if (!res.ok) return [];

@@ -26,6 +26,8 @@ const CITY_TO_COUNTRY: Record<string, string> = {
   guinea: "Guinea",
 };
 
+const IMPACTPOOL_JOBS_URL = "https://www.impactpool.org/jobs";
+
 function matchCountry(location: string): string | null {
   const lower = location.toLowerCase();
   for (const [key, country] of Object.entries(CITY_TO_COUNTRY)) {
@@ -35,18 +37,14 @@ function matchCountry(location: string): string | null {
 }
 
 /**
- * Impactpool's public jobs feed is server-rendered HTML (no client-side
- * fetch required), but it doesn't expose a reliable country query param —
- * so we fetch their live recent-jobs feed and keep only postings whose
- * location text matches a West African country or major city. Best-effort:
- * on any given sync it may return zero matches if no West-Africa-based
- * roles are in their current top feed.
+ * Fetches jobs from Impactpool's HTML feed.
+ * Filters for West African locations based on city/country text matching.
  */
 export async function fetchImpactpoolJobs(): Promise<Job[]> {
   const source = getSourceMeta("impactpool")!;
 
   try {
-    const res = await fetch("https://www.impactpool.org/jobs", {
+    const res = await fetch(IMPACTPOOL_JOBS_URL, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; WAIJBot/1.0)" },
       next: { revalidate: 900 },
     });

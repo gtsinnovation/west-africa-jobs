@@ -7,18 +7,8 @@ function src(id: string) {
 }
 
 /**
- * Curated, representative sample listings for the partner boards that we
- * confirmed CANNOT be reliably live-scraped (verified by direct inspection):
- *  - NGO Jobs in Africa: listings render via a proprietary JS widget with no
- *    exposed public API (their WordPress REST API only serves generic
- *    pages/posts, not the job board data).
- *  - Devex: fronted by DataDome anti-bot/CAPTCHA — returns a JS challenge
- *    page to any non-browser request.
- *  - DevelopmentAid: blocks non-browser requests outright (empty response).
- *  - CTG: job listings are rendered by a client-side widget backed by their
- *    "Tayo" HR platform with no public API surface.
- * These are illustrative samples — not scraped live — clearly tagged with a
- * "Sample listing" badge, each linking through to the real partner job board.
+ * Curated sample listings for partner boards that cannot be live-scraped.
+ * Each sample is tagged with "Sample listing" and links to the real job board.
  */
 export function getSampleExternalJobs(): Job[] {
   return [

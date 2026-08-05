@@ -5,8 +5,7 @@ import { fetchWacsiJobs } from "@/lib/external-jobs/wacsi";
 import { fetchImpactpoolJobs } from "@/lib/external-jobs/impactpool";
 import { getSampleExternalJobs } from "@/lib/external-jobs/samples";
 
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes — kind to cellular data plans
-                                      // and to our partner sites' servers.
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 interface SyncState {
   jobs: Job[];
