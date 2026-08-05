@@ -28,12 +28,11 @@ export interface ReliefWebResult {
   error: string | null;
 }
 
+const RELIEFWEB_API_BASE = "https://api.reliefweb.int/v2/jobs";
+
 /**
- * Live ReliefWeb API connector. ReliefWeb's public API requires a
- * pre-approved `appname` before it will serve traffic. We use the appname
- * provided via env var RELIEFWEB_APPNAME. If ReliefWeb returns 403 (appname
- * not yet approved for this environment) we surface that honestly instead
- * of silently failing.
+ * Fetches jobs from ReliefWeb API. Requires RELIEFWEB_APPNAME env var.
+ * Returns live:false with error message if API is unavailable or returns 403.
  */
 export async function fetchReliefWebJobs(): Promise<ReliefWebResult> {
   const appname = process.env.RELIEFWEB_APPNAME;
@@ -42,17 +41,18 @@ export async function fetchReliefWebJobs(): Promise<ReliefWebResult> {
   }
 
   const source = getSourceMeta("reliefweb")!;
-  const params = new URLSearchParams();
-  params.set("appname", appname);
-  params.set("profile", "list");
-  params.set("preset", "latest");
-  params.set("slim", "1");
-  params.set("limit", "20");
-  params.set("filter[field]", "country.name");
+  const params = new URLSearchParams({
+    appname,
+    profile: "list",
+    preset: "latest",
+    slim: "1",
+    limit: "20",
+    "filter[field]": "country.name",
+  });
   WEST_AFRICA_COUNTRIES.forEach((c) => params.append("filter[value][]", c));
 
   try {
-    const res = await fetch(`https://api.reliefweb.int/v2/jobs?${params.toString()}`, {
+    const res = await fetch(`${RELIEFWEB_API_BASE}?${params.toString()}`, {
       next: { revalidate: 900 },
     });
 
