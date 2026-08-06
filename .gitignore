@@ -1,56 +1,5 @@
 # Dependencies
 node_modules/
-
-# Build outputs
-dist/
-build/
-.next/
-
-# Environment variables
-.env
-.env.local
-.env.
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# MyPy cache
-.mypy_cache/
-
-# Pytest cache
-.pytest_cache/
-
-# Prisma
-prisma/migrations/
-```
-```
-# Dependencies
-node_modules/
 .pnpm-store/
 .yarn/
 npm-debug.log*
