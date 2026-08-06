@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
   const admin = username ? await findAdminByUsername(username) : undefined;
 
- if (!admin || !admin.passwordHash || !(await bcrypt.compare(password, admin.passwordHash))) {
+ if (!admin || !admin.passwordHash || !password || !(await bcrypt.compare(password, admin.passwordHash))) {
   return NextResponse.json({ error: "Incorrect username or password." }, { status: 401 });
 }
 
