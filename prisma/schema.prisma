@@ -31,6 +31,98 @@ model Job {
 }
 
 model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  passwordHash          String
+  verified              Boolean   @default(false)
+  verificationToken     String?   @unique
+  verificationExpiresAt DateTime?
+  otpCode               String?
+  otpExpiresAt          DateTime?
+  emailChangedAt        DateTime?
+  resumeFilename        String?
+  resumeUrl             String?
+  resumeUploadedAt      DateTime?
+  resumeSizeBytes       Int?
+  createdAt             DateTime  @default(now())
+}
+
+model PasswordResetToken {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token       String   @unique
+  expiresAt   DateTime
+  used        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([token])
+}
+
+model Insight {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  summary       String   @db.Text
+  content       String   @db.Text
+  category      String
+  coverImageUrl String?
+  published     Boolean  @default(true)
+  publishedDate String
+  updatedAt     String
+
+  @@index([published])
+}
+
+model WebhookLog {
+  id         String   @id @default(cuid())
+  source     String
+  status     String
+  receivedAt DateTime @default(now())
+  detail     String   @db.Text
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Job {
+  id                String   @id @default(cuid())
+  title             String
+  organization      String
+  city              String?
+  country           String
+  sector            String
+  jobType           String
+  applicationUrl    String
+  description       String   @db.Text
+  postedDate        String
+  closingDate       String
+  archived          Boolean  @default(false)
+  sourceId          String   @default("direct")
+  sourceName        String   @default("West Africa Impact Jobs")
+  sourceHomepageUrl String   @default("")
+  isExternal        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  @@index([archived])
+  @@index([postedDate])
+}
+
+model Admin {
   id                    String    @id @default(cuid())
   username              String    @unique
   passwordHash          String?
@@ -64,7 +156,6 @@ model User {
   resumeUploadedAt      DateTime?
   resumeSizeBytes       Int?
   createdAt             DateTime  @default(now())
-   passwordResetTokens   PasswordResetToken[]
 }
 
 model PasswordResetToken {
