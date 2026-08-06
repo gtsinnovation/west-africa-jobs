@@ -64,6 +64,7 @@ model User {
   resumeUploadedAt      DateTime?
   resumeSizeBytes       Int?
   createdAt             DateTime  @default(now())
+   passwordResetTokens   PasswordResetToken[]
 }
 
 model PasswordResetToken {
