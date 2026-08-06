@@ -18,9 +18,9 @@ export async function POST(request: Request) {
 
   const admin = username ? await findAdminByUsername(username) : undefined;
 
-  if (!admin || !(await bcrypt.compare(password ?? "", admin.passwordHash))) {
-    return NextResponse.json({ error: "Incorrect username or password." }, { status: 401 });
-  }
+ if (!admin || !admin.passwordHash || !(await bcrypt.compare(password, admin.passwordHash))) {
+  return NextResponse.json({ error: "Incorrect username or password." }, { status: 401 });
+}
 
   const response = NextResponse.json({ success: true });
   response.cookies.set(ADMIN_COOKIE, createAdminSessionToken(admin.id), {
