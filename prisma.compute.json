@@ -1,0 +1,11 @@
+{
+  "region": "us-east-1",
+  "app": {
+    "name": "nextjs-app",
+    "framework": "nextjs",
+    "httpPort": 3000,
+    "build": {
+      "command": "next build"
+    }
+  }
+}
